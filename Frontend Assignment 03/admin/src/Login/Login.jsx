@@ -1,15 +1,14 @@
 import React, { useState,useEffect, useContext } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate, Redirect } from 'react-router-dom';
 import UserAPI from '../API/UserAPI';
 import { AuthContext } from '../Context/AuthContext';
-
 import './Login.css';
 
 const Login = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [user, setUser] = useState([]);
-	const { loading, error, dispatch } = useContext(AuthContext);
+	// const [user, setUser] = useState([]);
+	const { user, loading, error, dispatch } = useContext(AuthContext);
 	// const navigate = useNavigate();
 
 	// useEffect(() => {
@@ -22,16 +21,18 @@ const Login = () => {
 	// 	fetchData();
 	// }, []);
 
-	const handleSubmit = () => {
-			const response = UserAPI.getAllData({email, password});
+	const handleSubmit = async () => {
+			const response = await UserAPI.getAllData({email, password});
 		// const findUser = user.find((value) => {
 		// 	return value.email === email;
 		// });
-
 		// if (findUser && findUser.password === password) {
 		if (response.meta.statusCode) {
 			dispatch({ type: 'LOGIN_SUCCESS', payload: response.data });
+			localStorage.setItem('id_user', response.data.id);
 			// navigate("/")
+			localStorage.setItem("user", JSON.stringify(response.data));
+			alert(response.meta.message)
 		} else {
 			alert(response.meta.message)
 		}
@@ -42,7 +43,6 @@ const Login = () => {
 		// } else {
 		// 	setErrorPassword(false);
 
-		// 	localStorage.setItem('id_user', findUser._id);
 
 		// 	localStorage.setItem('name_user', findUser.fullname);
 
@@ -86,7 +86,7 @@ const Login = () => {
 										onChange={(e) => setPassword(e.target.value)}
 									/>
 								</div>
-
+								{!user && <Redirect to={`/`} />}
 								<button
 									type='button'
 									className='float'

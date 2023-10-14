@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import {useHistory} from "react-router-dom"
 import queryString from "query-string";
 import ProductAPI from "../API/ProductAPI";
 import Pagination from "./Component/Pagination";
 
 function Products(props) {
   const [products, setProducts] = useState([]);
+  const history = useHistory()
 
   const [pagination, setPagination] = useState({
     page: "0",
@@ -43,20 +45,26 @@ function Products(props) {
     });
   };
 
+  const deleteHandle = async (id) => {
+    const vetify = window.confirm("Bạn có chắc muốn xóa sản phẩm");
+    if (vetify) {
+      const remove = ProductAPI.deletedProducts(id);
+      await alert(remove.meta.message)
+    }
+  }
+
   //Gọi hàm useEffect tìm tổng số sản phẩm để tính tổng số trang
   //Và nó phụ thuộc và state pagination
   useEffect(() => {
     const fetchAllData = async () => {
       const response = await ProductAPI.getAPI();
-      console.log(response);
 
       //Tính tổng số trang = tổng số sản phẩm / số lượng sản phẩm 1 trang
       const totalPage = Math.ceil(
         parseInt(response.data?.totalItem) / parseInt(pagination.count)
       );
-      console.log(totalPage);
 
-      setTotalPage(totalPage.data?.totalItem);
+      setTotalPage(totalPage);
     };
 
     fetchAllData();
@@ -77,7 +85,7 @@ function Products(props) {
       const newQuery = "?" + query;
 
       const response = await ProductAPI.getPagination(newQuery);
-      console.log(response);
+      // console.log(response);
 
       setProducts(response.data?.categoryProducts);
     };
@@ -158,6 +166,8 @@ function Products(props) {
                             <td>{value.category}</td>
                             <td>
                               <a
+                                href="/new"
+                                onClick={() => history.push({pathname:"/new" ,state: value})}
                                 style={{
                                   cursor: "pointer",
                                   color: "white",
@@ -167,7 +177,8 @@ function Products(props) {
                                 Update
                               </a>
                               &nbsp;
-                              <a
+                              <button
+                              onClick={() => deleteHandle(value._id)}
                                 style={{
                                   cursor: "pointer",
                                   color: "white",
@@ -175,7 +186,7 @@ function Products(props) {
                                 className="btn btn-danger"
                               >
                                 Delete
-                              </a>
+                              </button>
                             </td>
                           </tr>
                         ))}

@@ -7,11 +7,11 @@ const histories = require("../../controller/admin/history");
 const firewall = require("../../middleware/auth");
 
 // product
-router.get("/products", firewall, product.getProducts);
+router.get("/products", product.getProducts);
 
-router.get("/products/pagination", firewall, product.getPaginationProducts);
+router.get("/products/pagination", product.getPaginationProducts);
 
-router.get("/products/:id", firewall, product.getDetailProducts);
+router.get("/products/:id", product.getDetailProducts);
 
 // cart
 router.get("/carts", firewall, product.getCartUser);

@@ -14,7 +14,7 @@ function LoginLink(props) {
 		if (response) {
 			// alertify.set('notifier', 'position', 'bottom-left');
 			// alertify.error('Bạn Đã Xóa Hàng Thành Công!');
-			alert(response?.meta.message)
+			console.log(response?.meta)
 		}
 		const action = deleteSession('');
 		dispatch(action);

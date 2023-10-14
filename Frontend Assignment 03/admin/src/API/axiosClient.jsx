@@ -5,7 +5,7 @@ import queryString from 'query-string';
 // Please have a look at here `https://github.com/axios/axios#requestconfig` for the full list of configs
 const axiosClient = axios.create({
 	baseURL: 'http://localhost:5000',
-	withCredentials: true,
+	withCredentials: true, // Accept server attack cookie
 	headers: {
 		'content-type': 'application/json',
 	},
@@ -15,11 +15,11 @@ axiosClient.interceptors.request.use(async (config) => {
 	const cookie = document.cookie ;
 	// Handle token here ...
 	const configCookie = decodeURIComponent(cookie).split(';');
-	// console.log(configCookie);
 	if (cookie?.length > 0) {
 		config.headers['Cookie'] = `${cookie}` // set cookie send to server
 	}
-	config.headers['Authorization'] = `Bearer ${configCookie[0].split('=')[1]}`
+	config.headers['Authorization'] = `Bearer ${configCookie[0].split('=')[1]}`;
+    // config.headers['Content-Type'] = 'multipart/form-data';
 	return config;
 });
 axiosClient.interceptors.response.use(
@@ -30,6 +30,9 @@ axiosClient.interceptors.response.use(
 		return response;
 	},
 	(error) => {
+		if (error) {
+			return localStorage.removeItem("id_user")
+		}
 		// Handle errors
 		throw error;
 	}

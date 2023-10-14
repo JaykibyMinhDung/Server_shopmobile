@@ -30,7 +30,6 @@ function Pagination(props) {
 		if (!handlerChangePage) {
 			return;
 		}
-
 		const newPage = parseInt(value) - 1;
 		handlerChangePage(newPage);
 	};
@@ -43,7 +42,6 @@ function Pagination(props) {
 		const newPage = parseInt(value) + 1;
 		handlerChangePage(newPage);
 	};
-
 	return (
 		<nav aria-label='Page navigation example' className='pt-5'>
 			<ul className='pagination justify-content-center justify-content-lg-end'>

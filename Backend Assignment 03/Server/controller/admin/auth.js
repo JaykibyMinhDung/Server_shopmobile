@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-
+  console.log(email, password);
   let AddCookieUser;
   User.findOne({ email: email })
     .then((user) => {
@@ -14,7 +14,7 @@ exports.login = (req, res, next) => {
           meta: { message: "Hãy điền email và mật khẩu", statusCode: 0 },
         });
       }
-      if (user?.role !== 2) {
+      if (user?.role < 1) {
         return res.json({
           meta: { message: "Tài khoản không phải admin", statusCode: 0 },
         });
@@ -30,7 +30,6 @@ exports.login = (req, res, next) => {
     .then((account) => {
       if (!account) {
         const error = new Error("Mật khẩu đăng nhập không đúng");
-        throw error;
       }
       const token = jwt.sign({ id: 7, role: "admin" }, "ASSIGNMENT3$");
 
@@ -42,24 +41,28 @@ exports.login = (req, res, next) => {
         })
         .status(200)
         .json({
-          meta: [
-            {
-              message: "Đăng nhập thành công",
-              id: AddCookieUser._id,
-              fullname: AddCookieUser.fullName,
-              email: email,
-              cookie: token,
-            },
-          ],
+          data: {
+            id: AddCookieUser._id,
+            fullname: AddCookieUser.fullName,
+            role: AddCookieUser?.role,
+            email: email,
+            cookie: token,
+          },
+          meta: {
+            message: "Đăng nhập thành công",
+            statusCode: 1,
+          },
         });
     })
-    .catch(() => {
-      res.json({
-        meta: {
-          message: "Đăng nhập thất bại",
-          statusCode: 0,
-        },
-      });
+    .catch((err) => {
+      if (!err) {
+        return res.json({
+          meta: {
+            message: "Đăng nhập thất bại",
+            statusCode: 0,
+          },
+        });
+      }
     });
 };
 
@@ -84,5 +87,14 @@ exports.getAllUser = (req, res, next) => {
           statusCode: 0,
         },
       });
+    });
+};
+
+exports.logout = (req, res, next) => {
+  return res
+    .status(200)
+    .clearCookie("access_token")
+    .json({
+      meta: { message: "Tài khoản đã đăng xuất", statusCode: 1 },
     });
 };

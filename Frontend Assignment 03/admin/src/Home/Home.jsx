@@ -10,7 +10,7 @@ function Home(props) {
 	const [history, setHistory] = useState([]);
 	const [user, setUser] = useState([])
 	async function fetchData() {
-		const response = await HistoryAPI.getAll();
+		const response = await HistoryAPI.getHistoryMonth();
 		const responseUser = await UserAPI.getAllUser();
 		setUser(responseUser);
 		setHistory(response);
@@ -26,8 +26,8 @@ function Home(props) {
 
 	return (
 		<div className='page-wrapper'>
-			{history?.data?.transaction.length && user?.data?.inforUser.length &&
-			<>
+			{/* {history?.data?.transaction.length && user?.data?.inforUser.length && */}
+			{/* <> */}
 			<div className='page-breadcrumb'>
 				<div className='row'>
 					<div className='col-7 align-self-center'>
@@ -54,7 +54,7 @@ function Home(props) {
 								<div>
 									<div className='d-inline-flex align-items-center'>
 										<h2 className='text-dark mb-1 font-weight-medium'>
-											{user.data?.amountUser}
+											{history?.data?.transaction.length && user?.data?.inforUser.length ? user.data?.amountUser : 0}
 										</h2>
 									</div>
 									<h6 className='text-muted font-weight-normal mb-0 w-100 text-truncate'>
@@ -74,7 +74,7 @@ function Home(props) {
 							<div className='d-flex d-lg-flex d-md-block align-items-center'>
 								<div>
 									<h2 className='text-dark mb-1 w-100 text-truncate font-weight-medium'>
-										<sup className='set-doller'>VND </sup>{totalEarningHistories.toLocaleString("de-DE")}
+										<sup className='set-doller'>VND </sup>{history?.data?.transaction.length && user?.data?.inforUser.length ? totalEarningHistories.toLocaleString("de-DE") : 0}
 									</h2>
 									<h6 className='text-muted font-weight-normal mb-0 w-100 text-truncate'>
 										Earnings of Month
@@ -94,7 +94,7 @@ function Home(props) {
 								<div>
 									<div className='d-inline-flex align-items-center'>
 										<h2 className='text-dark mb-1 font-weight-medium'>
-											{history?.data.totalLength}
+											{history?.data?.transaction.length && user?.data?.inforUser.length ? history?.data.totalLength : 0}
 										</h2>
 									</div>
 									<h6 className='text-muted font-weight-normal mb-0 w-100 text-truncate'>
@@ -231,6 +231,7 @@ function Home(props) {
 						</div>
 					</div>
 				</div> */}
+				{history?.data?.transaction.length && user?.data?.inforUser.length &&
 				<div className='row'>
 					<div className='col-12'>
 						<div className='card'>
@@ -289,8 +290,9 @@ function Home(props) {
 						</div>
 					</div>
 				</div>
+				}
 			</div>
-			</>}
+			{/* </>} */}
 			<footer className='footer text-center text-muted'>
 
 			</footer>

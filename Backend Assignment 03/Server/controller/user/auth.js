@@ -73,6 +73,7 @@ exports.login = (req, res, next) => {
                 message: "Đăng nhập thành công",
                 id: AddCookieUser._id,
                 fullname: AddCookieUser.fullName,
+                role: AddCookieUser?.role,
                 email: email,
                 cookie: token,
               },

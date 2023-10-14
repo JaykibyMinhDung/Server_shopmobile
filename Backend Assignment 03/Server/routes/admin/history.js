@@ -7,4 +7,6 @@ const histories = require("../../controller/admin/history");
 
 router.get("/histories/all", auth, histories.getAllHistory);
 
+router.get("/histories/month", auth, histories.getMonthHistory);
+
 module.exports = router;

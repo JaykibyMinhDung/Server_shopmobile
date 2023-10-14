@@ -97,9 +97,16 @@ exports.addToCart = (req, res, next) => {
     .then((user) => {
       Products.findById(cart.idProduct)
         .then((product) => {
-          // const arrProduct = [];
+          if (product?.amount < cart?.count) {
+            return res.json({
+              meta: {
+                message:
+                  "Số lượng hàng đã hết hoặc có ít hơn số lượng đặt, vui lòng mua sản phẩm khác",
+                statuscode: 0,
+              },
+            });
+          }
           const configKeyProducts = () => {
-            // product.map((e) => {
             return {
               img: product.image[0],
               idProduct: product._id,
@@ -108,9 +115,10 @@ exports.addToCart = (req, res, next) => {
               idUser: cart.idUser,
               count: cart.count,
             };
-            // });
           };
+          product.amount = product.amount - 1;
           user.order.push(configKeyProducts()); // Chỉnh sửa lại giá trị trong mảng
+          product.save();
           return user.save();
         })
         .then(() => {
@@ -160,23 +168,31 @@ exports.getCartUser = (req, res, next) => {
 exports.deleteCartUser = (req, res, next) => {
   const idUser = req.query.idUser;
   const idProduct = req.query.idProduct;
+  let amountUser;
   Users.findById(idUser)
     .exec()
     .then((user) => {
-      const test = user.order.findIndex(
+      const indexProduct = user.order.findIndex(
         (e) => e?.idProduct.toString() === idProduct
       );
-      user.order.splice(test, 1);
+      amountUser = user.order[indexProduct];
+      user.order.splice(indexProduct, 1);
       return user.save();
     })
     .then((test) => {
-      return res.json({
-        meta: {
-          // product: test,
-          message: "Xóa sản phầm thành công",
-          statusCode: 1,
-        },
-      });
+      Products.findById(idProduct)
+        .then((product) => {
+          product.amount = product.amount + amountUser.count;
+          return product.save();
+        })
+        .then(() => {
+          return res.json({
+            meta: {
+              message: "Xóa sản phầm thành công",
+              statusCode: 1,
+            },
+          });
+        });
     })
     .catch((err) => {
       return res.json({

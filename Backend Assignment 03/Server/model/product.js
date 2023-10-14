@@ -42,6 +42,10 @@ const productSchema = new Schema({
     type: Number,
     require: true,
   },
+  amount: {
+    type: Number,
+    require: true,
+  },
 });
 
 module.exports = mongoose.model("Product", productSchema);

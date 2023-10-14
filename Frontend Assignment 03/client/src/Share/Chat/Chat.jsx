@@ -22,12 +22,12 @@ function Chat(props) {
   const [load, setLoad] = useState(false);
 
   // Hàm này dùng để mở hộp thoại chat
-  const onChat = () => {
+  const onChat = async () => {
     setActiveChat(!activeChat);
-    if (!roomId) {
-      const newRoomData = ChatRoomsAPI.createNewRoom();
-      setRoomId(newRoomData?.data.id);
-      localStorage.setItem("njs_asm3_roomId", newRoomData.data.id);
+    if (roomId === 'undefined' || !roomId) {
+      const newRoomData = await ChatRoomsAPI.createNewRoom();
+      setRoomId(newRoomData.data?.id);
+      await newRoomData.meta?.statusCode === 1 && localStorage.setItem("njs_asm3_roomId", newRoomData.data?.id);
     }
   };
 
@@ -37,7 +37,6 @@ function Chat(props) {
 
   const handlerSend = async () => {
     //Sau đó nó emit dữ liệu lên server bằng socket với key send_message và value data
-
     // Check if text equal "/end" then end room
     if (roomId && textMessage.toLowerCase() === "/end") {
       await ChatRoomsAPI.addMessage({
@@ -95,7 +94,7 @@ function Chat(props) {
 
   useEffect(() => {
     setLoad(true);
-    console.log("nguyen nhan 1");
+    // console.log("nguyen nhan 1");
   }, [roomId]);
 
   //Hàm này dùng để nhận socket từ server gửi lên

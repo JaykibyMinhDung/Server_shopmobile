@@ -69,7 +69,7 @@ function Detail(props) {
 
 	// Hàm này dùng để bình luận
 	const handlerComment = () => {
-		if (idUser === '') {
+		if (idUser === null || !idUser) {
 			alertify.set('notifier', 'position', 'bottom-left');
 			alertify.error('Vui Lòng Kiểm Tra Đăng Nhập!');
 			return;
@@ -207,13 +207,15 @@ function Detail(props) {
 			};
 
 			fetchPost();
+			
+		alertify.set('notifier', 'position', 'bottom-left');
+		alertify.success('Bạn Đã Thêm Hàng Thành Công!');
 		} else {
 			const action = addCart(data);
 			dispatch(action);
+			alertify.set('notifier', 'position', 'bottom-left');
+			alertify.error('Bạn cần đăng nhập để thêm giỏ hàng này!');
 		}
-
-		alertify.set('notifier', 'position', 'bottom-left');
-		alertify.success('Bạn Đã Thêm Hàng Thành Công!');
 	};
 
 	// console.log(detail);

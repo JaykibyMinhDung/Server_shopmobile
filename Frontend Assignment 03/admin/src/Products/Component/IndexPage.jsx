@@ -23,10 +23,8 @@ function IndexPage(props) {
 			return;
 		}
 
-		handlerChangePage(value);
+		handlerChangePage(value-1);
 	};
-
-	console.log(indexPage);
 
 	return (
 		<div className='d-flex'>
@@ -34,7 +32,7 @@ function IndexPage(props) {
 				indexPage.map((value) => (
 					<li
 						className={
-							value === parseInt(page) ? 'page-item active' : 'page-item'
+							(value - 1) === parseInt(page) ? 'page-item active' : 'page-item'
 						}
 						key={value}
 						onClick={() => onIndexPage(value)}>

@@ -59,10 +59,21 @@ exports.createRoomChat = (req, res, next) => {
 
 exports.addNewMessage = (req, res, next) => {
   const params = req.body;
-  console.log(params);
   let newMessage;
   Session.findById(params.roomId)
     .then((session) => {
+      if (params.message === "==END ROOM==") {
+        newMessage = session;
+        session.message.push({
+          text: "Kết thúc cuộc trò chuyện, bắt đầu sang cuộc trò chuyện mới",
+          is_admin: 1,
+        });
+        return {
+          ...session._doc,
+          admin: params.idUser,
+          endDate: new Date(),
+        };
+      }
       if (params.is_admin) {
         newMessage = session;
         session.message.push({ text: params.message, is_admin: 1 });
@@ -81,16 +92,29 @@ exports.addNewMessage = (req, res, next) => {
       }
     })
     .then((newChat) => {
-      // io.on("receive_message", (params, callback) => {
-      //   console.log(params);
-      //   callback(newMessage)
-      // })
+      io.getIO().on("connection", (socket) => {
+        socket.on("send_message", async (param, callback) => {
+          console.log(param); // world
+          try {
+            callback({
+              status: "OK",
+              param,
+            });
+          } catch (e) {
+            callback({
+              status: "NOT OK",
+            });
+          }
+        });
+      });
       io.getIO().emit("receive_message", {
         content: newChat.message,
       });
-      io.getIO().emit("send_message", {
-        content: newChat.message,
-      });
+      // io.getIO().emit("send_message", {
+      //   content: newChat.message,
+      // });
+      // io.getIO().on("send_message", (message) => {
+      // });
       newMessage.save();
       return res.json({
         data: newChat,
@@ -98,7 +122,7 @@ exports.addNewMessage = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.log("Lỗi liên quan đến tìm sai id phòng");
       res.json({
         meta: "Tạm thời tin nhắn đang bị lỗi, xin vui lòng gửi lại sau",
         statusCode: 0,

@@ -15,6 +15,11 @@ const HistoryAPI = {
 		const url = '/histories/all';
 		return axiosClient.get(url);
 	},
+
+	getHistoryMonth: () => {
+		const url = '/histories/month';
+		return axiosClient.get(url);
+	},
 };
 
 export default HistoryAPI;

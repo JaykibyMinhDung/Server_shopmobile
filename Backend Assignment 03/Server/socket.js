@@ -7,6 +7,11 @@ module.exports = {
         origin: "*",
       },
     });
+    // io.on("connection", (socket) => {
+    //   socket.on("send_message", (param) => {
+    //     console.log("socket", param);
+    //   });
+    // });
     // listening for connections from clients
     // io.on("connection", (socket) => {
     //   // listening to events from client
