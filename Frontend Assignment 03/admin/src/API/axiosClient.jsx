@@ -6,6 +6,7 @@ import queryString from 'query-string';
 const axiosClient = axios.create({
 	baseURL: 'http://localhost:5000',
 	withCredentials: true, // Accept server attack cookie
+	// credentials: "include",
 	headers: {
 		'content-type': 'application/json',
 	},
@@ -15,6 +16,7 @@ axiosClient.interceptors.request.use(async (config) => {
 	const cookie = document.cookie ;
 	// Handle token here ...
 	const configCookie = decodeURIComponent(cookie).split(';');
+	// console.log(configCookie)
 	if (cookie?.length > 0) {
 		config.headers['Cookie'] = `${cookie}` // set cookie send to server
 	}

@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const multer = require("multer");
 
+var cors = require("cors");
+
 const app = express();
 const url = "mongodb://127.0.0.1:27017/Assignment3";
 
@@ -59,10 +61,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", [
-    "http://localhost:3000",
-    // "http://localhost:3001",
-  ]); // set cookie for this url
+  res.setHeader("Access-Control-Allow-Origin", "*"); // set cookie for this url
   res.setHeader(
     "Access-Control-Allow-Methods",
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
@@ -70,11 +69,19 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Credentials", true); // accept send anything from client
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, Cookie"
+    "Content-Type, Authorization, Cookie, X-Requested-With"
   ); // , Accept, X-Requested-With, Origin
   // res.setHeader("Set-Cookie", ["type=ninja", "language=javascript"]); // set cookie from server for private url
   next();
 });
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+    sameSite: "none",
+  })
+);
 
 // admin
 app.use(adminRoutesAuth);

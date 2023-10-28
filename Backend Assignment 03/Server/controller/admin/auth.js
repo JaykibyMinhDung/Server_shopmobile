@@ -34,7 +34,7 @@ exports.login = (req, res, next) => {
       const token = jwt.sign({ id: 7, role: "admin" }, "ASSIGNMENT3$");
 
       return res
-        .cookie("access_token", token, {
+        .cookie("admin_token", token, {
           maxAge: 86400 * 1000,
           httpOnly: true, // Chặn đọc cookie bên client
           secure: process.env.NODE_ENV === "Assignment",

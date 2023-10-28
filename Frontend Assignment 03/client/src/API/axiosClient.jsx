@@ -6,6 +6,7 @@ import queryString from 'query-string';
 const axiosClient = axios.create({
 	baseURL: 'http://localhost:5000',
 	withCredentials: true, // accept send new data from client 
+	// credentials: "include",
 	headers: {
 		'content-type': 'application/json',
 		// 'Cookie': 'value1=Helloworld'

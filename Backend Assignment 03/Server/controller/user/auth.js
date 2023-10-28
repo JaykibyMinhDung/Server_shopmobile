@@ -54,11 +54,11 @@ exports.login = (req, res, next) => {
         const error = new Error("Mật khẩu đăng nhập không đúng");
         throw error;
       }
-      const token = jwt.sign({ id: 7, role: "admin" }, "ASSIGNMENT3$");
+      const token = jwt.sign({ id: 7, role: "client" }, "ASSIGNMENT3");
 
       return (
         res
-          .cookie("access_token", token, {
+          .cookie("client_token", token, {
             maxAge: 86400 * 1000,
             httpOnly: true, // Chặn đọc cookie bên client
             secure: process.env.NODE_ENV === "Assignment",

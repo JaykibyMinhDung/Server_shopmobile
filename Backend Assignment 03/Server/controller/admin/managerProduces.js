@@ -68,7 +68,7 @@ exports.updatedAllProducts = (req, res, next) => {
 exports.addNewProducts = (req, res, next) => {
   const { name, category, short_desc, long_desc } = req.body;
   const imageArr = [];
-  console.log(req.files);
+  // console.log(req.files);
   for (const key of req.files) {
     imageArr.push(key.path.replace(/\\/g, "/"));
   }
