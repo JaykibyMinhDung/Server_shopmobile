@@ -118,7 +118,7 @@ exports.getUser = (req, res, next) => {
 exports.logout = (req, res, next) => {
   return res
     .status(200)
-    .clearCookie("access_token")
+    .clearCookie("client_token")
     .json({
       meta: { message: "Tài khoản đã đăng xuất", statusCode: 1 },
     });

@@ -4,7 +4,10 @@
   "description": "server asm 3",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-server": "node app.js",
+    "start": "SET NODE_ENV=production MONGO_DEFAULT_DATABASE=Assignment3 SENDGRIDTRANSPORT_KEY=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"
   },
   "keywords": [
     "server"

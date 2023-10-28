@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 
 const transporter = nodemailer.createTransport(
-  // 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
+  //
   sendgridTransport({
     auth: {
       api_key:
@@ -254,7 +254,7 @@ exports.sendMailCheckout = (req, res, next) => {
       return await transporter
         .sendMail({
           to: information_user.to,
-          from: "dungdmfx16748@funix.edu.vn",
+          from: process.env.MAIL_ADMIN, // "dungdmfx16748@funix.edu.vn"
           subject: "Xác nhận đặt đơn hàng",
           html:
             message +

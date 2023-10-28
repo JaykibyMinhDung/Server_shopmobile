@@ -9,7 +9,7 @@ const multer = require("multer");
 var cors = require("cors");
 
 const app = express();
-const url = "mongodb://127.0.0.1:27017/Assignment3";
+const url = `mongodb://127.0.0.1:27017/Assignment3`;
 
 const authRoutes = require("./routes/user/auth");
 const productRoutes = require("./routes/user/products");
@@ -96,11 +96,12 @@ app.use((error, req, res, next) => {
   console.log(error);
   res.status(500).json({ message: "Server error", SatusCode: 500 });
 });
+// SET NODE_ENV=development
 
 mongoose
   .connect(url)
   .then((results) => {
-    const server = app.listen(5000);
+    const server = app.listen(process.env.PORT || 5000);
     const io = require("./socket").init(server);
     io.on("connection", (socket) => {
       console.log("Client connected");
