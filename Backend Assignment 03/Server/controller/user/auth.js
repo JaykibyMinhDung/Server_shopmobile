@@ -3,6 +3,7 @@ const cookie = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 
 const User = require("../../model/user");
+const { getJwtSecret } = require("../../util/auth");
 
 exports.signup = (req, res, next) => {
   const email = req.query.email;
@@ -54,7 +55,7 @@ exports.login = (req, res, next) => {
         const error = new Error("Mật khẩu đăng nhập không đúng");
         throw error;
       }
-      const token = jwt.sign({ id: 7, role: "client" }, "ASSIGNMENT3");
+      const token = jwt.sign({ id: 7, role: "client" }, getJwtSecret());
 
       return (
         res
