@@ -1,0 +1,4 @@
+## 2024-05-22 - Hardcoded JWT Secret
+**Vulnerability:** Found a hardcoded JWT secret "ASSIGNMENT3" directly in the controller and middleware files. This allows anyone with knowledge of the code to forge authentication tokens and impersonate any user, including potentially privileged accounts.
+**Learning:** Hardcoded secrets are often duplicated across files (controller and middleware), increasing the attack surface and making rotation difficult. The lack of a centralized configuration management (like `dotenv` or a config file) contributed to this pattern.
+**Prevention:** Always use environment variables for secrets. Implement a configuration module that validates the presence of these variables on startup. For non-production environments where convenience is needed, a randomly generated secret on startup is safer than a hardcoded static one, as it prevents persistence of compromised sessions.

@@ -1,5 +1,6 @@
 // sẽ có một số API không cần phải đăng nhập cũng có thể lấy được dữ liệu như API trả về dữ liệu cho Homepage hay lấy thông tin cụ thể một sản phẩm.
 const jwt = require("jsonwebtoken");
+const { getJwtSecret } = require("../util/auth");
 
 module.exports = (req, res, next) => {
   // console.log(req.headers);
@@ -13,7 +14,7 @@ module.exports = (req, res, next) => {
     return res.status(403).json({ message: "bạn chưa đăng nhập tài khoản" });
   }
   try {
-    const data = jwt.verify(value, "ASSIGNMENT3");
+    const data = jwt.verify(value, getJwtSecret());
     // const vetifyToken = jwt.verify(token, "ASSIGNMENT3$");
     // || !vetifyToken
     if (!data) {
