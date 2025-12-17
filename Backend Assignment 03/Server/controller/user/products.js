@@ -3,17 +3,16 @@ const Users = require("../../model/user");
 const Orders = require("../../model/order");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-const sendgridTransport = require("nodemailer-sendgrid-transport");
 
-const transporter = nodemailer.createTransport(
-  //
-  sendgridTransport({
-    auth: {
-      api_key:
-        "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",
-    },
-  })
-);
+// Use standard SMTP via Nodemailer or SendGrid service helper if installed.
+// Here we use the standard nodemailer transport with environment variables.
+const transporter = nodemailer.createTransport({
+  service: "SendGrid",
+  auth: {
+    user: "apikey", // "apikey" is the required username for SendGrid SMTP
+    pass: process.env.SENDGRID_API_KEY,
+  },
+});
 
 exports.getProducts = (req, res, next) => {
   Products.find()
