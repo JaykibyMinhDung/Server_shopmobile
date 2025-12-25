@@ -6,10 +6,11 @@ const User = require("../../model/user");
 const { getJwtSecret } = require("../../util/auth");
 
 exports.signup = (req, res, next) => {
-  const email = req.query.email;
-  const password = req.query.password;
-  const fullName = req.query.fullname;
-  const phone = req.query.phone;
+  // Use req.body instead of req.query for secure data transmission
+  const email = req.body.email;
+  const password = req.body.password;
+  const fullName = req.body.fullname;
+  const phone = req.body.phone;
   User.findOne({ email: email }).then((account) => {
     if (account) {
       return res.json({ message: "Email đã tồn tại" });
