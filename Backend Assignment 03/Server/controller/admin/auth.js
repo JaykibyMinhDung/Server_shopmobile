@@ -1,6 +1,7 @@
 const User = require("../../model/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getJwtSecret } = require("../../util/auth");
 
 exports.login = (req, res, next) => {
   const email = req.body.email;
@@ -30,8 +31,9 @@ exports.login = (req, res, next) => {
     .then((account) => {
       if (!account) {
         const error = new Error("Mật khẩu đăng nhập không đúng");
+        throw error;
       }
-      const token = jwt.sign({ id: 7, role: "admin" }, "ASSIGNMENT3$");
+      const token = jwt.sign({ id: AddCookieUser._id, role: "admin" }, getJwtSecret());
 
       return res
         .cookie("admin_token", token, {
