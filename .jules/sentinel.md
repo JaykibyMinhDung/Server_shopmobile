@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2025-05-20 - Hardcoded JWT Secret and Fragile Cookie Parsing
+**Vulnerability:** The `auth-admin` middleware used a hardcoded secret string "ASSIGNMENT3$" for JWT verification and blindly parsed the first cookie in the header.
+**Learning:** Hardcoding secrets makes them visible to anyone with code access. Fragile parsing (splitting by `;` and taking index 0) fails when multiple cookies exist (e.g., Google Analytics, session cookies), potentially locking out legitimate admins or allowing bypass if they can manipulate cookie order.
+**Prevention:** Use environment variables or secure key rotation helpers for secrets. Use robust parsers like `cookie-parser` (`req.cookies`) instead of manual string manipulation.
