@@ -34,11 +34,12 @@ const fileStorage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
-  ) {
+  const allowedMimes = ["image/png", "image/jpg", "image/jpeg"];
+  const allowedExts = [".png", ".jpg", ".jpeg"];
+  // 🛡️ Sentinel Fix: Validate file extension to prevent Stored XSS
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
     cb(null, true);
   } else {
     cb(null, false);
