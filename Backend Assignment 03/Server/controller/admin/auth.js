@@ -6,33 +6,51 @@ const { getJwtSecret } = require("../../util/auth");
 exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
+  if (!email || !password) {
+    return res.json({
+      meta: { message: "Hãy điền email và mật khẩu", statusCode: 0 },
+    });
+  }
+
   let AddCookieUser;
   User.findOne({ email: email })
     .then((user) => {
-      if (!email && !password) {
-        return res.json({
-          meta: { message: "Hãy điền email và mật khẩu", statusCode: 0 },
-        });
+      // NOTE: Original code checked !email && !password here inside the promise,
+      // but it's better to check before the DB call.
+      // However, to minimize changes, I will focus on the execution flow logic.
+
+      if (!user) {
+        // Explicitly throw an error to break the promise chain and go to .catch
+        // OR return a specific value that the next .then can handle.
+        // Returning res.json() creates a response object, which is truthy.
+        // We MUST NOT proceed to bcrypt.compare if user is invalid.
+        res.status(403).json({ meta: { message: "Đăng nhập thất bại", statusCode: 0 } });
+        return null; // Stop chain logic
       }
-      if (user?.role < 1) {
-        return res.json({
+
+      if (user.role < 1) {
+        res.json({
           meta: { message: "Tài khoản không phải admin", statusCode: 0 },
         });
+        return null; // Stop chain logic
       }
-      if (!user) {
-        return res
-          .status(403)
-          .json({ meta: { message: "Đăng nhập thất bại", statusCode: 0 } });
-      }
+
       AddCookieUser = user;
       return bcrypt.compare(password, user.password);
     })
-    .then((account) => {
-      if (!account) {
+    .then((isMatch) => {
+      // If previous step returned null (response already sent), stop here.
+      if (isMatch === null) {
+        return;
+      }
+
+      if (!isMatch) {
         return res.status(401).json({
           meta: { message: "Mật khẩu đăng nhập không đúng", statusCode: 0 },
         });
       }
+
       const token = jwt.sign(
         { id: AddCookieUser._id, role: "admin" },
         getJwtSecret()
@@ -60,8 +78,9 @@ exports.login = (req, res, next) => {
         });
     })
     .catch((err) => {
-      if (!err) {
-        return res.json({
+      console.error(err);
+      if (!res.headersSent) {
+         return res.json({
           meta: {
             message: "Đăng nhập thất bại",
             statusCode: 0,
