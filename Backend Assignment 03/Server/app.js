@@ -1,4 +1,5 @@
 const path = require("path");
+const crypto = require("crypto");
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -26,10 +27,27 @@ const fileStorage = multer.diskStorage({
   //   cb(null, path.join(__dirname, "/images/"));
   // },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      new Date().setTime(new Date().getTime()) + "-" + file.originalname
-    );
+    // Generate a secure random filename
+    const uniqueSuffix = crypto.randomBytes(16).toString("hex");
+    const originalExt = path.extname(file.originalname).toLowerCase();
+
+    // Whitelist allowed extensions based on fileFilter
+    let ext = "";
+    if (originalExt === ".png" || originalExt === ".jpg" || originalExt === ".jpeg") {
+      ext = originalExt;
+    } else {
+      // Fallback/Force extension based on mimetype if original extension is missing or invalid but mimetype passed filter
+      if (file.mimetype === "image/png") ext = ".png";
+      else if (file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") ext = ".jpg";
+    }
+
+    // If still no valid extension, we might want to reject or save without extension (safer than allowing arbitrary)
+    // But fileFilter should have caught invalid mimetypes.
+    // If a user uploads evil.html as image/png, fileFilter passes.
+    // originalExt is .html. We do NOT want to use it.
+    // So if originalExt is not in whitelist, we use the fallback based on mimetype.
+
+    cb(null, uniqueSuffix + ext);
   },
 });
 
