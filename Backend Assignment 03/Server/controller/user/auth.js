@@ -53,38 +53,38 @@ exports.login = (req, res, next) => {
     })
     .then((account) => {
       if (!account) {
-        const error = new Error("Mật khẩu đăng nhập không đúng");
-        throw error;
+        throw new Error("Mật khẩu đăng nhập không đúng");
       }
-      const token = jwt.sign({ id: 7, role: "client" }, getJwtSecret());
-
-      return (
-        res
-          .cookie("client_token", token, {
-            maxAge: 86400 * 1000,
-            httpOnly: true, // Chặn đọc cookie bên client
-            secure: process.env.NODE_ENV === "Assignment",
-          })
-          .status(200)
-          // .json([
-          //   { message: "Đăng nhập thành công", email: email, cookie: token },
-          // ]);
-          .json({
-            meta: [
-              {
-                message: "Đăng nhập thành công",
-                id: AddCookieUser._id,
-                fullname: AddCookieUser.fullName,
-                role: AddCookieUser?.role,
-                email: email,
-                cookie: token,
-              },
-            ],
-          })
+      const token = jwt.sign(
+        { id: AddCookieUser._id, role: "client" },
+        getJwtSecret()
       );
+
+      return res
+        .cookie("client_token", token, {
+          maxAge: 86400 * 1000,
+          httpOnly: true, // Chặn đọc cookie bên client
+          secure: process.env.NODE_ENV === "Assignment",
+        })
+        .status(200)
+        .json({
+          meta: [
+            {
+              message: "Đăng nhập thành công",
+              id: AddCookieUser._id,
+              fullname: AddCookieUser.fullName,
+              role: AddCookieUser?.role,
+              email: email,
+              cookie: token,
+            },
+          ],
+        });
     })
-    .catch(() => {
-      res.json({
+    .catch((err) => {
+      // Do not attempt to send another response if one was already sent (e.g. 401 above)
+      if (res.headersSent) return;
+      console.error(err);
+      res.status(401).json({
         meta: {
           message: "Đăng nhập thất bại",
           statusCode: 0,
