@@ -1,26 +1,33 @@
 // sẽ có một số API không cần phải đăng nhập cũng có thể lấy được dữ liệu như API trả về dữ liệu cho Homepage hay lấy thông tin cụ thể một sản phẩm.
 const jwt = require("jsonwebtoken");
+const { getJwtSecret } = require("../util/auth");
 
 module.exports = (req, res, next) => {
-  // console.log(req.headers);
-  // const authHeader = req.get("Authorization");
-  // const token = authHeader.split(" ")[1];
-  const nameToken = req.headers?.cookie.split(";")[0];
-  const [name, value] = nameToken.split("=");
-  // || !authHeader
-  if (!value) {
+  // Use cookie-parser for reliable cookie retrieval
+  // instead of fragile header splitting that fails with multiple cookies
+  const token = req.cookies && req.cookies.admin_token;
+
+  if (!token) {
     return res.status(403).json({ message: "bạn chưa đăng nhập tài khoản" });
   }
+
   try {
-    const data = jwt.verify(value, "ASSIGNMENT3$");
-    // const vetifyToken = jwt.verify(token, "ASSIGNMENT3$");
-    // || !vetifyToken
+    // Verify using the dynamic secret instead of hardcoded "ASSIGNMENT3$"
+    const data = jwt.verify(token, getJwtSecret());
+
     if (!data) {
-      throw Error;
+      throw new Error("Invalid token");
     }
+
+    // Security Enhancement: Ensure the token belongs to an admin
+    // This is critical now that we share the same secret key for all tokens
+    if (data.role !== "admin") {
+      throw new Error("Unauthorized role");
+    }
+
     req.userId = data.id;
     next();
-  } catch {
+  } catch (err) {
     return res
       .status(403)
       .json({ message: "Mật khẩu đăng nhập chưa đúng, vui lòng thử lại" });
