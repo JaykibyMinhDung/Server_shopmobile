@@ -6,9 +6,10 @@ module.exports = (req, res, next) => {
   // console.log(req.headers);
   // const authHeader = req.get("Authorization");
   // const token = authHeader.split(" ")[1];
-  const nameToken = req.headers?.cookie.split(";")[1];
-  // console.log(nameToken);
-  const [name, value] = nameToken.split("=");
+
+  // Sentinel Fix: Use cookie-parser req.cookies for robust parsing
+  const value = req.cookies.client_token;
+
   // || !authHeader
   if (!value) {
     return res.status(403).json({ message: "bạn chưa đăng nhập tài khoản" });

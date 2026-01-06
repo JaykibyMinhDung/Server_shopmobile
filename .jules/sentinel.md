@@ -11,3 +11,12 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+## 2025-05-23 - Hardcoded User ID in Authentication Token
+**Vulnerability:** The user login controller (`controller/user/auth.js`) was hardcoding the user ID in the JWT payload to `7` for all users (`{ id: 7, role: "client" }`).
+**Learning:** This effectively bypassed all user-level isolation, making every logged-in user access the data and permissions of user ID 7. This likely happened during debugging or development and was never reverted.
+**Prevention:** Avoid hardcoding IDs or roles in token generation logic, even for testing. Use integration tests to verify that the token payload matches the authenticated user.
+
+## 2025-05-23 - Inconsistent and Hardcoded Admin Secrets
+**Vulnerability:** The Admin authentication middleware (`middleware/auth-admin.js`) verified tokens using a hardcoded string `"ASSIGNMENT3$"`, while the controller signed them using `getJwtSecret()`. If the environment variable was missing, they might mismatch (random vs hardcoded), or if set, the middleware ignored it.
+**Learning:** Security middleware and controllers must share the same configuration source for secrets. Hardcoding secrets in middleware creates a single point of failure and rotation difficulty.
+**Prevention:** Centralize secret management (e.g., in `util/auth.js`) and ensure all parts of the application import from there.

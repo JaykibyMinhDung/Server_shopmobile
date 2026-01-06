@@ -97,16 +97,18 @@ app.use((error, req, res, next) => {
 });
 // SET NODE_ENV=development
 
-mongoose
-  .connect(url)
-  .then((results) => {
-    const server = app.listen(process.env.PORT || 5000);
-    const io = require("./socket").init(server);
-    io.on("connection", (socket) => {
-      console.log("Client connected");
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(url)
+    .then((results) => {
+      const server = app.listen(process.env.PORT || 5000);
+      const io = require("./socket").init(server);
+      io.on("connection", (socket) => {
+        console.log("Client connected");
+      });
+    })
+    .catch((err) => {
+      console.log(err.message);
     });
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
+}
 module.exports = app;
