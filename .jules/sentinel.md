@@ -1,13 +1,4 @@
-## 2024-05-22 - Hardcoded SendGrid API Key
-**Vulnerability:** A hardcoded SendGrid API key was found in `controller/user/products.js`. This key allows unauthorized actors to send emails on behalf of the application, potentially leading to phishing campaigns or spam.
-**Learning:** Hardcoded credentials in source code are a common but critical vulnerability. They are easily discovered by automated scanners.
-**Prevention:** Always use environment variables for third-party API keys. Ensure `.env` files are in `.gitignore`.
-
-## 2025-02-18 - Admin Authentication Bypass and Hardcoded JWT Secret
-**Vulnerability:** The admin login controller (`controller/admin/auth.js`) had a critical logic flaw where it generated a valid JWT even if the password check failed. Additionally, the JWT secret was hardcoded as "ASSIGNMENT3$".
-**Learning:** Promise chains in Express controllers can be dangerous if errors are not correctly propagated or if the success path doesn't explicitly check the result of previous operations. A `then` block runs even if the previous promise resolved with `false`, unless logic checks for that value.
-**Prevention:** Always explicitly check the result of authentication steps (like `bcrypt.compare`) and return/throw immediately on failure. Use centralized configuration for secrets.
-## 2024-05-23 - Sensitive Data in Query Params
-**Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
-**Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
-**Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+## 2024-05-24 - Hardcoded Secret in Admin Middleware
+**Vulnerability:** Found a hardcoded JWT secret (`"ASSIGNMENT3$"`) in `middleware/auth-admin.js`. This allowed anyone to forge admin tokens by knowing this string, which was committed to the codebase.
+**Learning:** The project had a utility `util/auth.js` to handle secrets securely, but this specific middleware was likely overlooked or copied from an insecure example and never updated to use the shared utility. The middleware also used fragile manual cookie parsing (`req.headers.cookie.split...`) instead of the available `cookie-parser`.
+**Prevention:** Ensure all authentication middleware uses the centralized configuration for secrets. Use `grep` to scan for hardcoded strings or patterns like `jwt.verify(..., "string")`. Standardize on `cookie-parser` usage for robust cookie handling.
