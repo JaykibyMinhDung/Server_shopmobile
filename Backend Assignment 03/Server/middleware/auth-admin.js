@@ -1,26 +1,35 @@
-// sẽ có một số API không cần phải đăng nhập cũng có thể lấy được dữ liệu như API trả về dữ liệu cho Homepage hay lấy thông tin cụ thể một sản phẩm.
 const jwt = require("jsonwebtoken");
+const { getJwtSecret } = require("../util/auth");
 
 module.exports = (req, res, next) => {
-  // console.log(req.headers);
-  // const authHeader = req.get("Authorization");
-  // const token = authHeader.split(" ")[1];
-  const nameToken = req.headers?.cookie.split(";")[0];
-  const [name, value] = nameToken.split("=");
-  // || !authHeader
-  if (!value) {
+  // Use req.cookies provided by cookie-parser for robust access
+  // Fallback to manual parsing only if necessary (though req.cookies is preferred)
+  let token = req.cookies?.admin_token;
+
+  if (!token && req.headers.cookie) {
+     // Fallback for cases where cookie-parser might not run or for some edge cases,
+     // but we look specifically for admin_token
+     const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
+        const [key, val] = cookie.trim().split('=');
+        acc[key] = val;
+        return acc;
+     }, {});
+     token = cookies['admin_token'];
+  }
+
+  if (!token) {
     return res.status(403).json({ message: "bạn chưa đăng nhập tài khoản" });
   }
+
   try {
-    const data = jwt.verify(value, "ASSIGNMENT3$");
-    // const vetifyToken = jwt.verify(token, "ASSIGNMENT3$");
-    // || !vetifyToken
+    const data = jwt.verify(token, getJwtSecret());
+
     if (!data) {
-      throw Error;
+      throw new Error("Token verification failed");
     }
     req.userId = data.id;
     next();
-  } catch {
+  } catch (err) {
     return res
       .status(403)
       .json({ message: "Mật khẩu đăng nhập chưa đúng, vui lòng thử lại" });
