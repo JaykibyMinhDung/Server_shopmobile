@@ -1,13 +1,9 @@
-## 2024-05-22 - Hardcoded SendGrid API Key
-**Vulnerability:** A hardcoded SendGrid API key was found in `controller/user/products.js`. This key allows unauthorized actors to send emails on behalf of the application, potentially leading to phishing campaigns or spam.
-**Learning:** Hardcoded credentials in source code are a common but critical vulnerability. They are easily discovered by automated scanners.
-**Prevention:** Always use environment variables for third-party API keys. Ensure `.env` files are in `.gitignore`.
+## 2024-03-24 - Hardcoded Secret in Admin Middleware
+**Vulnerability:** Found a hardcoded secret `"ASSIGNMENT3$"` in `middleware/auth-admin.js` used to verify JWTs, while the signing process used a dynamic secret.
+**Learning:** Inconsistent usage of secrets (one file hardcoded, another dynamic) can lead to broken authentication or false security if the dynamic secret defaults to a random value.
+**Prevention:** Always use a centralized configuration or utility (like `getJwtSecret()`) for secrets to ensure consistency and security across signing and verification.
 
-## 2025-02-18 - Admin Authentication Bypass and Hardcoded JWT Secret
-**Vulnerability:** The admin login controller (`controller/admin/auth.js`) had a critical logic flaw where it generated a valid JWT even if the password check failed. Additionally, the JWT secret was hardcoded as "ASSIGNMENT3$".
-**Learning:** Promise chains in Express controllers can be dangerous if errors are not correctly propagated or if the success path doesn't explicitly check the result of previous operations. A `then` block runs even if the previous promise resolved with `false`, unless logic checks for that value.
-**Prevention:** Always explicitly check the result of authentication steps (like `bcrypt.compare`) and return/throw immediately on failure. Use centralized configuration for secrets.
-## 2024-05-23 - Sensitive Data in Query Params
-**Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
-**Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
-**Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+## 2024-03-24 - Fragile Cookie Parsing
+**Vulnerability:** Authentication middleware parsed cookies by index (`req.headers.cookie.split(";")[0]`), which is extremely fragile and breaks if multiple cookies exist or order changes.
+**Learning:** Manual parsing of headers is error-prone.
+**Prevention:** Always use `cookie-parser` and access `req.cookies` by key.
