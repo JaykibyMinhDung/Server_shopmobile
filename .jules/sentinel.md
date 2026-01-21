@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2025-02-18 - Inconsistent JWT Secret Usage and Fragile Cookie Parsing
+**Vulnerability:** The `middleware/auth-admin.js` used a hardcoded secret "ASSIGNMENT3$" and fragile manual cookie parsing, while the login controller used a dynamic secret. This broke admin authentication and posed a security risk if the hardcoded secret was relied upon.
+**Learning:** Security fixes must be applied holistically across all components (issuance and verification). Changing a secret in the controller without updating the middleware renders the system broken or vulnerable.
+**Prevention:** Use a shared utility or configuration for secrets. Search the entire codebase for usage of hardcoded strings when refactoring secrets.
