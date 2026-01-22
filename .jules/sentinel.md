@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2025-02-19 - Hardcoded User Identity and Fragile Cookie Parsing
+**Vulnerability:** The user login controller hardcoded the user ID to `7` in the JWT payload, effectively impersonating that user for everyone. Additionally, authentication middleware relied on manual cookie string splitting (`cookie.split(';')[1]`), which failed if the token wasn't in the exact expected position.
+**Learning:** Hardcoding test values (like ID 7) during development and forgetting to replace them is a critical risk. Also, manually parsing standardized headers like Cookies is prone to breakage and security bypasses compared to using established middleware like `cookie-parser`.
+**Prevention:** Use code review checklists to catch hardcoded "magic numbers". Always use robust, standard libraries for parsing HTTP headers and cookies.
