@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2025-05-30 - Inconsistent Secret Management in Middleware
+**Vulnerability:** The admin authentication middleware (`middleware/auth-admin.js`) verified tokens using a hardcoded string "ASSIGNMENT3$", while the login controller (`controller/admin/auth.js`) signed tokens using a dynamic secret helper. This caused valid admin tokens to be rejected unless the dynamic secret happened to match the hardcoded string (unlikely).
+**Learning:** Security logic must be consistent across the entire application. Modifying a helper function (like `getJwtSecret`) is insufficient if consumers of that secret (like middleware) do not import and use the helper.
+**Prevention:** Avoid magic strings entirely. Centralize configuration constants and audit usages of sensitive values using `grep`.
