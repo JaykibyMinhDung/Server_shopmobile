@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2024-05-24 - Inconsistent Authentication Mechanisms & Fragile Cookie Parsing
+**Vulnerability:** The `middleware/auth-admin.js` used a hardcoded secret and manually parsed cookies using fragile string splitting, while `middleware/auth.js` used the correct dynamic secret but also had fragile parsing. This allowed authentication bypass if the cookie order changed and exposed the admin interface to token forgery.
+**Learning:** Inconsistent security implementations (some files using env vars, others hardcoded) are dangerous. Manual parsing of standard headers (like Cookie) is error-prone and should be replaced by established middleware.
+**Prevention:** Use a single source of truth for authentication logic. Use established libraries (`cookie-parser`) for parsing instead of custom string manipulation.
