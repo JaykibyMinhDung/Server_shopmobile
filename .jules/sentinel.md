@@ -11,3 +11,8 @@
 **Vulnerability:** The signup endpoint (`controller/user/auth.js`) was retrieving sensitive user data (password, PII) from `req.query`.
 **Learning:** Developers might mistakenly use `req.query` in POST requests if not familiar with Express request objects, leading to credentials being logged in access logs and browser history.
 **Prevention:** Always enforce use of `req.body` for POST/PUT requests handling sensitive data. Ensure body parsing middleware is configured.
+
+## 2024-05-24 - Hardcoded User ID in JWT Generation
+**Vulnerability:** The user login controller (`controller/user/auth.js`) was generating JWTs with a hardcoded user ID `7` and role `"client"`, regardless of which user actually logged in. This allowed any user to impersonate user #7.
+**Learning:** Placeholder values in authentication logic can be catastrophic if not replaced. The code verified the password correctly but issued a token for the wrong identity.
+**Prevention:** Always verify that the token payload is derived dynamically from the authenticated user's data.
