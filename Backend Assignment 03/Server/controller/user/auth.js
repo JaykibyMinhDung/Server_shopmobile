@@ -56,7 +56,10 @@ exports.login = (req, res, next) => {
         const error = new Error("Mật khẩu đăng nhập không đúng");
         throw error;
       }
-      const token = jwt.sign({ id: 7, role: "client" }, getJwtSecret());
+      const token = jwt.sign(
+        { id: AddCookieUser._id, role: "client" },
+        getJwtSecret()
+      );
 
       return (
         res
