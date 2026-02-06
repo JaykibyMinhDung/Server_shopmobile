@@ -39,51 +39,58 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
+  if (!email || !password) {
+    return res.json({ message: "Hãy điền email và mật khẩu" });
+  }
+
   let AddCookieUser;
   User.findOne({ email: email })
     .then((user) => {
-      if (!email && !password) {
-        return res.json({ message: "Hãy điền email và mật khẩu" });
-      }
       if (!user) {
-        return res.status(401).json({ message: "Đăng nhập thất bại" });
+        const error = new Error("User not found");
+        error.statusCode = 401;
+        throw error;
       }
       AddCookieUser = user;
       return bcrypt.compare(password, user.password);
     })
-    .then((account) => {
-      if (!account) {
+    .then((isEqual) => {
+      if (!isEqual) {
         const error = new Error("Mật khẩu đăng nhập không đúng");
+        error.statusCode = 401;
         throw error;
       }
-      const token = jwt.sign({ id: 7, role: "client" }, getJwtSecret());
-
-      return (
-        res
-          .cookie("client_token", token, {
-            maxAge: 86400 * 1000,
-            httpOnly: true, // Chặn đọc cookie bên client
-            secure: process.env.NODE_ENV === "Assignment",
-          })
-          .status(200)
-          // .json([
-          //   { message: "Đăng nhập thành công", email: email, cookie: token },
-          // ]);
-          .json({
-            meta: [
-              {
-                message: "Đăng nhập thành công",
-                id: AddCookieUser._id,
-                fullname: AddCookieUser.fullName,
-                role: AddCookieUser?.role,
-                email: email,
-                cookie: token,
-              },
-            ],
-          })
+      // FIX: Use actual user ID and role instead of hardcoded values
+      const token = jwt.sign(
+        { id: AddCookieUser._id, role: AddCookieUser.role },
+        getJwtSecret()
       );
+
+      return res
+        .cookie("client_token", token, {
+          maxAge: 86400 * 1000,
+          httpOnly: true, // Chặn đọc cookie bên client
+          secure: process.env.NODE_ENV === "Assignment",
+        })
+        .status(200)
+        .json({
+          meta: [
+            {
+              message: "Đăng nhập thành công",
+              id: AddCookieUser._id,
+              fullname: AddCookieUser.fullName,
+              role: AddCookieUser?.role,
+              email: email,
+              cookie: token,
+            },
+          ],
+        });
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.statusCode === 401) {
+        return res.status(401).json({ message: "Đăng nhập thất bại" });
+      }
       res.json({
         meta: {
           message: "Đăng nhập thất bại",
